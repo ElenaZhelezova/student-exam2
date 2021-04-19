@@ -1,0 +1,11 @@
+/jenkins_home/
+/js_example.egg-info/
+/venv/
+/.coverage
+/jenkins_git
+/jenkins_git.pub
+/requirements.txt
+/.idea/
+/js_example/__pycache__/
+/tests/__pycache__/
+
