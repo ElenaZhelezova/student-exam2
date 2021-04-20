@@ -1,6 +1,6 @@
 FROM python:3.8
 
-RUN adduser --disabled-password webapp
+RUN useradd webapp
 
 WORKDIR /home/webapp
 
@@ -11,14 +11,13 @@ COPY MANIFEST.in MANIFEST.in
 COPY README.rst README.rst
 COPY setup.cfg setup.cfg
 COPY setup.py setup.py
+COPY requirements.txt requirements.txt
+
+RUN pip install -r requirements.txt
 
 RUN chown -R webapp:webapp ./
 
 USER webapp
-
-RUN python -m pip install --upgrade pip
-RUN pip install -e .
-RUN pip install -e '.[test]'
 
 ENV FLASK_APP=js_example
 
