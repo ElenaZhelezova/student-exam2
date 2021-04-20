@@ -8,12 +8,7 @@ pipeline {
   stages {
     stage('Cloning git repo'){
       steps{
-        git
-        checkout([
-                $class: 'GitSCM',
-                branches: [[ name: "master" ]],
-                userRemoteConfigs: [[credentialsId: "git_id", url: "https://github.com/ElenaZhelezova/student-exam2.git"]]
-        ])
+        git "https://github.com/ElenaZhelezova/student-exam2.git"
       }
     }
     stage('Building image') {
