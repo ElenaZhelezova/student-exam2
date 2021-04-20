@@ -1,42 +1,52 @@
 pipeline {
-  environment {
-    registry = "elenazhelezova/exam_devops"
-    registryCredential = 'docker_id'
-    dockerImage = 'web_app'
-  }
-  agent any
-  stages {
-    stage('Cloning git repo'){
-      steps{
-        git "https://github.com/ElenaZhelezova/student-exam2.git"
-      }
+    environment {
+        registry = "elenazhelezova/exam_devops"
+        registryCredential = 'docker_id'
+        dockerImage = 'web_app'
     }
-    stage('Building image') {
-      steps{
-        script {
-          dockerImage = docker.build registry:dockerImage
+
+    agent any
+
+    stages {
+        stage('Cloning our Git') {
+            steps {
+                git 'https://github.com/ElenaZhelezova/student-exam2.git'
+            }
         }
-      }
-    }
-    stage('Testing app') {
-      steps{
-        sh 'coverage run -m pytest'
-        sh 'coverage report'
-      }
-    }
-    stage('Deploy Image') {
-      steps{
-        script {
-          docker.withRegistry( '', registryCredential ) {
-            dockerImage.push()
-          }
+
+        stage('Building our image') {
+            steps {
+                script {
+                    customImage = docker.build registry + ":$dockerImage" + "-$BUILD_NUMBER"
+                }
+            }
         }
-      }
+
+        stage('Testing app') {
+            steps {
+                script {
+                    customImage.inside {
+                        sh 'coverage run -m pytest'
+                        sh 'coverage report'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy our image') {
+            steps {
+                script {
+                    docker.withRegistry( '', registryCredential ) {
+                        customImage.push()
+                    }
+                }
+            }
+        }
+
+        stage('Cleaning up') {
+            steps {
+                sh "docker rmi $registry:$dockerImage-$BUILD_NUMBER"
+            }
+        }
     }
-    stage('Remove Unused docker image') {
-      steps{
-        sh "docker rmi $registry:$BUILD_NUMBER"
-      }
-    }
-  }
 }
