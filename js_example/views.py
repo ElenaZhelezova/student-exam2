@@ -1,5 +1,5 @@
 from flask import jsonify, render_template, request
-importimport socket
+import socket
 
 from js_example import app
 
